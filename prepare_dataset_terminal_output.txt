@@ -1,0 +1,133 @@
+/usr/bin/python3.5 /home/svh2811/visual7w-qa-models/prepare_dataset.py
+parsed input parameters:
+{
+  "output_h5": "data/qa_data.h5",
+  "word_count_threshold": 5,
+  "output_json": "data/qa_data.json",
+  "max_question_length": 15,
+  "image_dim": 224,
+  "dataset_json": "visual7w-toolkit/datasets/visual7w-telling/dataset.json",
+  "max_answer_length": 5,
+  "image_path": "images/v7w_%s.jpg",
+  "num_multiple_choice": 3
+}
+top words and their counts:
+(89956, 'the')
+(57532, 'is')
+(46557, 'what')
+(24914, 'are')
+(17165, 'in')
+(16980, 'a')
+(16029, 'where')
+(15039, 'on')
+(14545, 'how')
+(12464, 'color')
+(11044, 'many')
+(10668, 'of')
+(9994, 'who')
+(8839, 'taken?')
+(8283, 'this')
+(7861, 'was')
+(6253, 'why')
+(4992, 'picture')
+(4724, 'when')
+(4281, 'to')
+total words: 745708
+number of bad words: 12887/17359 = 74.24%
+number of words in vocab would be 4472
+number of UNKs: 22184/745708 = 2.97%
+max length sentence in raw data:  25
+sentence length distribution (count, number of words):
+ 0:          0   0.000000%
+ 1:      71581   25.588769%
+ 2:      29650   10.599279%
+ 3:      29732   10.628593%
+ 4:      28114   10.050190%
+ 5:      61024   21.814854%
+ 6:      25325   9.053179%
+ 7:      16005   5.721466%
+ 8:      10105   3.612334%
+ 9:       3971   1.419553%
+10:       1951   0.697443%
+11:       1181   0.422184%
+12:        540   0.193039%
+13:        265   0.094732%
+14:        142   0.050762%
+15:         58   0.020734%
+16:         39   0.013942%
+17:         25   0.008937%
+18:          7   0.002502%
+19:         13   0.004647%
+20:          2   0.000715%
+21:          3   0.001072%
+22:          1   0.000357%
+23:          0   0.000000%
+24:          1   0.000357%
+25:          1   0.000357%
+inserting the special UNK token
+wrote  data/qa_data.json
+encoded questions to array of size  (139868, 15)
+encoded answers to array of size  (139868, 5)
+encoded multiple choices to array of size  (139868, 3, 5)
+start to process images into hdf5
+processed 0 / 28653 images
+processed 500 / 28653 images
+processed 1000 / 28653 images
+processed 1500 / 28653 images
+processed 2000 / 28653 images
+processed 2500 / 28653 images
+processed 3000 / 28653 images
+processed 3500 / 28653 images
+processed 4000 / 28653 images
+processed 4500 / 28653 images
+processed 5000 / 28653 images
+processed 5500 / 28653 images
+processed 6000 / 28653 images
+processed 6500 / 28653 images
+processed 7000 / 28653 images
+processed 7500 / 28653 images
+processed 8000 / 28653 images
+processed 8500 / 28653 images
+processed 9000 / 28653 images
+processed 9500 / 28653 images
+processed 10000 / 28653 images
+processed 10500 / 28653 images
+processed 11000 / 28653 images
+processed 11500 / 28653 images
+processed 12000 / 28653 images
+processed 12500 / 28653 images
+processed 13000 / 28653 images
+processed 13500 / 28653 images
+processed 14000 / 28653 images
+processed 14500 / 28653 images
+processed 15000 / 28653 images
+processed 15500 / 28653 images
+processed 16000 / 28653 images
+processed 16500 / 28653 images
+processed 17000 / 28653 images
+processed 17500 / 28653 images
+processed 18000 / 28653 images
+processed 18500 / 28653 images
+processed 19000 / 28653 images
+processed 19500 / 28653 images
+processed 20000 / 28653 images
+processed 20500 / 28653 images
+processed 21000 / 28653 images
+processed 21500 / 28653 images
+processed 22000 / 28653 images
+processed 22500 / 28653 images
+processed 23000 / 28653 images
+processed 23500 / 28653 images
+processed 24000 / 28653 images
+processed 24500 / 28653 images
+processed 25000 / 28653 images
+processed 25500 / 28653 images
+processed 26000 / 28653 images
+processed 26500 / 28653 images
+processed 27000 / 28653 images
+processed 27500 / 28653 images
+processed 28000 / 28653 images
+processed 28500 / 28653 images
+wrote  data/qa_data.h5
+
+Process finished with exit code 0
