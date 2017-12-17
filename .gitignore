@@ -46,8 +46,9 @@ Thumbs.db
 *.ipr
 *.pyo
 *.pyc
-./.idea/*
-./.ipynb_checkpoints/*
+*/.idea
+*/.ipynb_checkpoints
+*/__pycache__
 
 # All Visual QA Dataset Files JSONs and JPEGs Files #
 # Either download them or regenerate them at local computer#
