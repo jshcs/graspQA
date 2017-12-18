@@ -6,7 +6,7 @@ import tensorflow as tf
 
 def load_placeholders(cfg):
     """
-    1. Placeholder for image. 
+    1. Placeholder for image.
     2. Placeholder for the question. 
     3. Placeholder for the answer.
     """
@@ -15,16 +15,16 @@ def load_placeholders(cfg):
     input_image = tf.placeholder(tf.float32, shape=(None, 448, 448, 3), name="input_image")
 
     ## 2. 
-    question_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.question_maxLength, cfg.embed_size),
+    question_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.question_max_words, cfg.embed_size),
                                           name="question_placeholder")
 
     ## 3. 
-    answer_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_maxLength, cfg.embed_size),
-                                        name="labels_image")
+    answer_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_max_words, cfg.embed_size),
+                                        name="answer_placeholder")
 
-    option1_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_maxLength, cfg.embed_size), name="option1")
-    option2_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_maxLength, cfg.embed_size), name="option2")
-    option3_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_maxLength, cfg.embed_size), name="option3")
+    option1_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_max_words, cfg.embed_size), name="option1")
+    option2_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_max_words, cfg.embed_size), name="option2")
+    option3_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_max_words, cfg.embed_size), name="option3")
     labels_placeholder = tf.placeholder(tf.float32, shape=(None, 4), name="labels")
 
     return input_image, question_placeholder, answer_placeholder, option1_placeholder, option2_placeholder, option3_placeholder, labels_placeholder
@@ -95,6 +95,8 @@ def load_weights(weight_file, sess, is_Train=True):
         'fc8_b': tf.Variable(tf.zeros([1000, ], dtype=tf.float32), name='fc8_b', trainable=is_Train)
     }
 
+    # @TODO: i is never used remove this
+    # @TODO: there's something fishy about this for loop gut feeling it can be improved
     for i, k in enumerate(keys):
         sess.run(weights[k].assign(weights_loaded[k]))
 
@@ -167,6 +169,7 @@ class encodeText(object):
     encodeText: to encode a question
     """
 
+    # @TODO: 100 and then 50, typo maybe
     def __init__(self, config, state_size=512, embed_size=100):
         self.state_size = 512
         self.embed_size = 50
@@ -192,7 +195,81 @@ class encodeText(object):
 
         return output_fw, final_state_fw
 
-    def encode_for(self, inputs, encoder_input=None, dropout=1.0):
+    def declareAttentionNetworkVariables(self):
+        # subscripts v: word token; h: output of lstm cell; r: attention of lstm cell;
+
+        # learnable weights and bias for 'i' gate
+        W_vi = tf.Variable(tf.truncated_normal([self.embed_size, self.cfg.batch_size], dtype=tf.float32),
+                           name='W_{vi}', trainable=is_Train);
+        W_hi = tf.Variable(tf.truncated_normal([self.cfg.batch_size, self.cfg.batch_size], dtype=tf.float32),
+                           name='W_{hi}', trainable=is_Train);
+        W_ri = tf.Variable(tf.truncated_normal([self.cfg.batch_size, self.cfg.batch_size], dtype=tf.float32),
+                           name='W_{ri}', trainable=is_Train);
+        b_i = tf.Variable(tf.truncated_normal([self.cfg.batch_size, self.state_size], dtype=tf.float32), name='b_{i}',
+                          trainable=is_Train);
+
+        # learnable weights and bias for 'f' gate
+        W_vf = tf.Variable(tf.truncated_normal([self.embed_size, self.cfg.batch_size], dtype=tf.float32),
+                           name='W_{vf}', trainable=is_Train);
+        W_hf = tf.Variable(tf.truncated_normal([self.cfg.batch_size, self.cfg.batch_size], dtype=tf.float32),
+                           name='W_{hf}', trainable=is_Train);
+        W_rf = tf.Variable(tf.truncated_normal([self.cfg.batch_size, self.cfg.batch_size], dtype=tf.float32),
+                           name='W_{rf}', trainable=is_Train);
+        b_f = tf.Variable(tf.truncated_normal([self.cfg.batch_size, self.state_size], dtype=tf.float32), name='b_{f}',
+                          trainable=is_Train);
+
+        # learnable weights and bias for 'o' gate
+        W_vo = tf.Variable(tf.truncated_normal([self.embed_size, self.cfg.batch_size], dtype=tf.float32),
+                           name='W_{vo}', trainable=is_Train);
+        W_ho = tf.Variable(tf.truncated_normal([self.cfg.batch_size, self.cfg.batch_size], dtype=tf.float32),
+                           name='W_{ho}', trainable=is_Train);
+        W_ro = tf.Variable(tf.truncated_normal([self.cfg.batch_size, self.cfg.batch_size], dtype=tf.float32),
+                           name='W_{ro}', trainable=is_Train);
+        b_o = tf.Variable(tf.truncated_normal([self.cfg.batch_size, self.state_size], dtype=tf.float32), name='b_{o}',
+                          trainable=is_Train);
+
+        # learnable weights and bias for 'g' gate
+        W_vg = tf.Variable(tf.truncated_normal([self.embed_size, self.cfg.batch_size], dtype=tf.float32),
+                           name='W_{vg}', trainable=is_Train);
+        W_hg = tf.Variable(tf.truncated_normal([self.cfg.batch_size, self.cfg.batch_size], dtype=tf.float32),
+                           name='W_{hg}', trainable=is_Train);
+        W_rg = tf.Variable(tf.truncated_normal([self.cfg.batch_size, self.cfg.batch_size], dtype=tf.float32),
+                           name='W_{rg}', trainable=is_Train);
+        b_g = tf.Variable(tf.truncated_normal([self.cfg.batch_size, self.state_size], dtype=tf.float32), name='b_{g}',
+                          trainable=is_Train);
+
+        # i am not sure of dimension of following:
+        W_a = tf.Variable(tf.truncated_normal([None, None], dtype=tf.float32),
+                          name='W_{a}', trainable=is_Train);
+        W_he = tf.Variable(tf.truncated_normal([None, None], dtype=tf.float32),
+                           name='W_{he}', trainable=is_Train);
+        W_ce = tf.Variable(tf.truncated_normal([None, None], dtype=tf.float32),
+                           name='W_{ce}', trainable=is_Train);
+        b_a = tf.Variable(tf.truncated_normal([self.cfg.batch_size, self.state_size], dtype=tf.float32),
+                          name='b_{a}', trainable=is_Train);
+
+        # Initialize this with 196 dimensional vector of fc4 layer of VGG-16 model.
+        self.C_I = None
+
+    def runAttentionLSTMNetworek(self, v):
+        sigmoid = tf.python.ops.math_ops.sigmoid
+        tanh = tf.python.ops.math_ops.tanh
+
+        e = tf.matmul(W_a, tanh(tf.matmul(W_he, h_prev) + tf.matmul(W_ce, C_I)), transpose_a=False) + b_a
+        a = softmax(e)
+        r = tf.matmul(a, C_I, transpose_a=False)
+
+        # original equations had v * W_ri we interchanged for matrix dimension match
+        i = sigmoid(tf.matmul(v, W_vi) + tf.matmul(W_hi, h_prev) + tf.matmul(W_vi, r) + b_i)
+        f = sigmoid(tf.matmul(v, W_vf) + tf.matmul(W_hf, h_prev) + tf.matmul(W_vf, r) + b_f)
+        o = sigmoid(tf.matmul(v, W_vo) + tf.matmul(W_ho, h_prev) + tf.matmul(W_vo, r) + b_o)
+        g = tanh(tf.matmul(W_vg, v) + tf.matmul(W_hg, h_prev) + tf.matmul(W_vg, r) + b_g)
+        c = f * c_prev + i * g;
+        h = o * tanh(c);
+
+        # @TODO: all of this in a loop and remember to set h_prev = h and c_prev = c
+
+    def encode_with_attentions(self, inputs, encoder_input=None, dropout=1.0):
         """
         Use this method rather than the method encode when you want to modify the LSTM cell than the 
         default LSTM Cell.
