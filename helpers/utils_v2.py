@@ -15,16 +15,16 @@ def load_placeholders(cfg):
     input_image = tf.placeholder(tf.float32, shape=(None, 448, 448, 3), name="input_image")
 
     ## 2. 
-    question_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.question_maxLength, cfg.embed_size),
+    question_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.question_max_words, cfg.embed_size),
                                           name="question_placeholder")
 
     ## 3. 
-    answer_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_maxLength, cfg.embed_size),
+    answer_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_max_words, cfg.embed_size),
                                         name="labels_image")
 
-    option1_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_maxLength, cfg.embed_size), name="option1")
-    option2_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_maxLength, cfg.embed_size), name="option2")
-    option3_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_maxLength, cfg.embed_size), name="option3")
+    option1_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_max_words, cfg.embed_size), name="option1")
+    option2_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_max_words, cfg.embed_size), name="option2")
+    option3_placeholder = tf.placeholder(tf.float32, shape=(None, cfg.answer_max_words, cfg.embed_size), name="option3")
     labels_placeholder = tf.placeholder(tf.float32, shape=(None, 4), name="labels")
 
     return input_image, question_placeholder, answer_placeholder, option1_placeholder, option2_placeholder, option3_placeholder, labels_placeholder
