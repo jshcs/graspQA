@@ -1,6 +1,6 @@
 class Config():
 
-    def __init__(self, batch_size=64, \
+    def __init__(self, batch_size=28, \
                  num_epochs=25, \
                  embed_size=50, \
                  state_size=512, \
